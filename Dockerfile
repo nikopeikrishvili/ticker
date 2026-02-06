@@ -30,13 +30,16 @@ RUN apk add --no-cache \
     unzip \
     oniguruma-dev \
     icu-dev \
-    mysql-client
+    postgresql-dev \
+    postgresql-client \
+    netcat-openbsd
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_mysql \
+        pdo_pgsql \
         mbstring \
         exif \
         pcntl \

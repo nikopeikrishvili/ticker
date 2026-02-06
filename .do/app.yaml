@@ -6,13 +6,7 @@ services:
       repo: YOUR_GITHUB_USERNAME/B5Todo
       branch: main
       deploy_on_push: true
-    build_command: |
-      composer install --no-dev --optimize-autoloader
-      npm ci && npm run build
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
-    run_command: heroku-php-apache2 public/
+    dockerfile_path: Dockerfile
     envs:
       - key: APP_ENV
         value: production
@@ -29,7 +23,7 @@ services:
         value: pgsql
     instance_count: 1
     instance_size_slug: basic-xxs
-    http_port: 8080
+    http_port: 80
 
 databases:
   - name: db
