@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { useRecurringTasks } from '@/Composables/useRecurringTasks';
+import { useRecurringTasks } from '@/composables/useRecurringTasks';
 
 const props = defineProps({
     show: {

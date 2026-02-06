@@ -1,19 +1,19 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import TodoList from '@/Components/TodoList.vue';
-import TimeLogList from '@/Components/TimeLogList.vue';
-import TodoModal from '@/Components/TodoModal.vue';
-import TimeLogModal from '@/Components/TimeLogModal.vue';
-import SettingsModal from '@/Components/SettingsModal.vue';
-import RecurringTasksModal from '@/Components/RecurringTasksModal.vue';
-import CarryOverDialog from '@/Components/CarryOverDialog.vue';
-import AppSidebar from '@/Components/AppSidebar.vue';
+import TodoList from '@/components/TodoList.vue';
+import TimeLogList from '@/components/TimeLogList.vue';
+import TodoModal from '@/components/TodoModal.vue';
+import TimeLogModal from '@/components/TimeLogModal.vue';
+import SettingsModal from '@/components/SettingsModal.vue';
+import RecurringTasksModal from '@/components/RecurringTasksModal.vue';
+import CarryOverDialog from '@/components/CarryOverDialog.vue';
+import AppSidebar from '@/components/AppSidebar.vue';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
-import { useTodos } from '@/Composables/useTodos';
-import { useTimeLogs } from '@/Composables/useTimeLogs';
-import { useSettings } from '@/Composables/useSettings';
+import { useTodos } from '@/composables/useTodos';
+import { useTimeLogs } from '@/composables/useTimeLogs';
+import { useSettings } from '@/composables/useSettings';
 
 const { addTodo, initializeDate, fetchTodos, fetchPendingFromPrevious, startWorking } = useTodos();
 const { timeLogs, addTimeLog, navigateDay, goToToday, formattedDate, isToday, fetchTimeLogs, stopTimeLog } = useTimeLogs();

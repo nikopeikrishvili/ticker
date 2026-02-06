@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { useWeeklyPlanner } from '@/Composables/useWeeklyPlanner';
+import { useWeeklyPlanner } from '@/composables/useWeeklyPlanner';
 import PlannerTask from './PlannerTask.vue';
 import GhostTask from './GhostTask.vue';
 

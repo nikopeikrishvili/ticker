@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useSettings } from '@/Composables/useSettings';
+import { useSettings } from '@/composables/useSettings';
 import axios from 'axios';
 
 const props = defineProps({

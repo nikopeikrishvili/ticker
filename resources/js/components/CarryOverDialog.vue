@@ -9,7 +9,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useTodos } from '@/Composables/useTodos';
+import { useTodos } from '@/composables/useTodos';
 
 const props = defineProps({
     show: {

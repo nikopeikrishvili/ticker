@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import { useWeeklyPlanner } from '@/Composables/useWeeklyPlanner';
-import { useTodos } from '@/Composables/useTodos';
+import { useWeeklyPlanner } from '@/composables/useWeeklyPlanner';
+import { useTodos } from '@/composables/useTodos';
 
 const emit = defineEmits(['taskDropped']);
 

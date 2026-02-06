@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useTodos } from '@/Composables/useTodos';
+import { useTodos } from '@/composables/useTodos';
 import {
     Table,
     TableBody,
@@ -8,10 +8,10 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/Components/ui/table';
-import { Badge } from '@/Components/ui/badge';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,14 +22,14 @@ import {
     DropdownMenuSubContent,
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/Components/ui/select';
+} from '@/components/ui/select';
 
 const props = defineProps({
     onOpenModal: {

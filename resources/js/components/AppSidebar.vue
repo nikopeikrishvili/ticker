@@ -21,10 +21,10 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { useTimeLogs } from '@/Composables/useTimeLogs';
-import { useAuth } from '@/Composables/useAuth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useTimeLogs } from '@/composables/useTimeLogs';
+import { useAuth } from '@/composables/useAuth';
 
 const props = defineProps<{
     showSettings?: () => void;

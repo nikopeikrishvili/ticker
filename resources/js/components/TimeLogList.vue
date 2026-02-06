@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { useTimeLogs } from '@/Composables/useTimeLogs';
+import { useTimeLogs } from '@/composables/useTimeLogs';
 import {
     Table,
     TableBody,
@@ -8,9 +8,9 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/Components/ui/table';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,7 +18,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 
 const props = defineProps({
     onOpenModal: {

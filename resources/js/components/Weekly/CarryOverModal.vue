@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useWeeklyPlanner } from '@/Composables/useWeeklyPlanner';
+import { useWeeklyPlanner } from '@/composables/useWeeklyPlanner';
 
 const props = defineProps({
     show: {

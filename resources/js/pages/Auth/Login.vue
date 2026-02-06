@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Checkbox } from '@/Components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const form = useForm({
     email: '',

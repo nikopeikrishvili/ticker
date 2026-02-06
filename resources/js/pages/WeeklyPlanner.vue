@@ -1,13 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useWeeklyPlanner } from '@/Composables/useWeeklyPlanner';
-import { useTodos } from '@/Composables/useTodos';
-import { useSettings } from '@/Composables/useSettings';
-import AppSidebar from '@/Components/AppSidebar.vue';
-import DayColumn from '@/Components/Weekly/DayColumn.vue';
-import BacklogColumn from '@/Components/Weekly/BacklogColumn.vue';
-import CarryOverModal from '@/Components/Weekly/CarryOverModal.vue';
-import SettingsModal from '@/Components/SettingsModal.vue';
+import { useWeeklyPlanner } from '@/composables/useWeeklyPlanner';
+import { useTodos } from '@/composables/useTodos';
+import { useSettings } from '@/composables/useSettings';
+import AppSidebar from '@/components/AppSidebar.vue';
+import DayColumn from '@/components/Weekly/DayColumn.vue';
+import BacklogColumn from '@/components/Weekly/BacklogColumn.vue';
+import CarryOverModal from '@/components/Weekly/CarryOverModal.vue';
+import SettingsModal from '@/components/SettingsModal.vue';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 
