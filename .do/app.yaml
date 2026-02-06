@@ -1,0 +1,38 @@
+name: ticker
+region: fra
+services:
+  - name: web
+    github:
+      repo: YOUR_GITHUB_USERNAME/B5Todo
+      branch: main
+      deploy_on_push: true
+    build_command: |
+      composer install --no-dev --optimize-autoloader
+      npm ci && npm run build
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    run_command: heroku-php-apache2 public/
+    envs:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        type: SECRET
+        value: "${APP_KEY}"
+      - key: APP_URL
+        value: "${APP_URL}"
+      - key: DATABASE_URL
+        value: "${db.DATABASE_URL}"
+      - key: DB_CONNECTION
+        value: pgsql
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 8080
+
+databases:
+  - name: db
+    engine: PG
+    production: false
+    version: "15"

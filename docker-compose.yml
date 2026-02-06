@@ -1,0 +1,90 @@
+can services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticker-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      - APP_NAME=${APP_NAME:-B5Todo}
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost:8080}
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-ticker}
+      - DB_USERNAME=${DB_USERNAME:-ticker}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - app-storage:/var/www/html/storage/app
+    networks:
+      - ticker-network
+
+  db:
+    image: mysql:8.0
+    container_name: ticker-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE:-ticker}
+      - MYSQL_USER=${DB_USERNAME:-ticker}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ticker-network
+
+  # Optional: Run scheduler for recurring tasks
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticker-scheduler
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          php /var/www/html/artisan schedule:run --verbose --no-interaction
+          sleep 60
+        done
+    environment:
+      - APP_NAME=${APP_NAME:-B5Todo}
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost:8080}
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-ticker}
+      - DB_USERNAME=${DB_USERNAME:-ticker}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    networks:
+      - ticker-network
+
+volumes:
+  db-data:
+  app-storage:
+
+networks:
+  ticker-network:
+    driver: bridge

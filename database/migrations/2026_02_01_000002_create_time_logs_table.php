@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('time_logs', function (Blueprint $table) {
+            $table->id();
+            $table->time('start_time');
+            $table->time('end_time')->nullable();
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+
+        // Add virtual column based on database driver
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement('ALTER TABLE time_logs ADD COLUMN duration_minutes INT GENERATED ALWAYS AS (TIMESTAMPDIFF(MINUTE, start_time, end_time)) VIRTUAL');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('ALTER TABLE time_logs ADD COLUMN duration_minutes INTEGER GENERATED ALWAYS AS (CAST((JULIANDAY(end_time) - JULIANDAY(start_time)) * 1440 AS INTEGER)) VIRTUAL');
+        }
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('time_logs');
+    }
+};
