@@ -9,6 +9,8 @@ RUN npm ci
 COPY vite.config.js ./
 COPY tailwind.config.js ./
 COPY postcss.config.js ./
+COPY tsconfig*.json ./
+COPY jsconfig.json ./
 COPY resources ./resources
 
 RUN npm run build
