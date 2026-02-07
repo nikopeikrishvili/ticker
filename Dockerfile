@@ -34,7 +34,8 @@ RUN apk add --no-cache \
     icu-dev \
     postgresql-dev \
     postgresql-client \
-    netcat-openbsd
+    netcat-openbsd \
+    redis
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
