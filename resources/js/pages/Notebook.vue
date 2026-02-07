@@ -240,9 +240,9 @@ onUnmounted(() => {
                 <!-- Notebook Container -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-88px)]">
                     <!-- LEFT PAGE: Todo List -->
-                    <Card class="p-6 overflow-hidden flex flex-col">
+                    <div class="overflow-hidden flex flex-col">
                         <TodoList :on-open-modal="openTodoModal" />
-                    </Card>
+                    </div>
 
                     <!-- RIGHT PAGE: Time Log -->
                     <Card class="p-6 overflow-hidden flex flex-col">
