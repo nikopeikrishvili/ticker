@@ -125,7 +125,7 @@ const handleToggleTask = async (id) => {
                 <div class="absolute inset-0 bg-[#1f2937]/50"></div>
 
                 <!-- Modal -->
-                <div class="relative bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-[#e5e7eb]">
+                <div class="relative bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden border border-[#e5e7eb]">
                     <!-- Header -->
                     <div class="bg-[#1f2937] px-6 py-4 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-white">განმეორებადი დავალებები</h3>

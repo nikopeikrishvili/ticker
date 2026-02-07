@@ -105,7 +105,7 @@ const tasksByDate = computed(() => {
 
 <template>
     <Dialog :open="show" @update:open="(val) => !val && handleClose()">
-        <DialogContent class="sm:max-w-[500px]">
+        <DialogContent class="sm:max-w-[640px]">
             <DialogHeader>
                 <DialogTitle>დაუსრულებელი დავალებები</DialogTitle>
                 <DialogDescription>

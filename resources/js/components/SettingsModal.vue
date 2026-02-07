@@ -267,7 +267,7 @@ const formatLastSync = (isoDate) => {
                 <div class="absolute inset-0 bg-[#1f2937]/50"></div>
 
                 <!-- Modal -->
-                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
+                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
                     <!-- Header -->
                     <div class="bg-[#1f2937] px-6 py-4 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-white">პარამეტრები</h3>
@@ -748,7 +748,7 @@ const formatLastSync = (isoDate) => {
                         @click.self="closeSyncTaskModal"
                     >
                         <div class="absolute inset-0 bg-[#1f2937]/50"></div>
-                        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
+                        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
                             <div class="bg-[#1f2937] px-6 py-4 flex items-center justify-between">
                                 <h3 class="text-lg font-bold text-white">ტიკეტის სინქრონიზაცია</h3>
                                 <button

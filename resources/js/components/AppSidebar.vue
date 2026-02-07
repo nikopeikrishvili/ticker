@@ -319,7 +319,7 @@ const navSecondary = computed(() => {
                 @click.self="showCategoryModal = false"
             >
                 <div class="absolute inset-0 bg-[#1f2937]/50"></div>
-                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
+                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-[#e5e7eb] dark:border-gray-700">
                     <!-- Header -->
                     <div class="bg-[#1f2937] px-6 py-4 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-white">კატეგორიები</h3>
