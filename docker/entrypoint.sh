@@ -11,8 +11,16 @@ if [ -n "$DATABASE_URL" ]; then
     DB_HOST=$(echo $DATABASE_URL | sed -e 's|.*@\(.*\):.*|\1|')
     DB_PORT=$(echo $DATABASE_URL | sed -e 's|.*:\([0-9]*\)/.*|\1|')
 
+    MAX_RETRIES=30
+    RETRY_COUNT=0
+
     while ! nc -z "$DB_HOST" "$DB_PORT" 2>/dev/null; do
-        echo "Database not ready, waiting..."
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+            echo "ERROR: Database at $DB_HOST:$DB_PORT not reachable after $MAX_RETRIES attempts"
+            exit 1
+        fi
+        echo "Database not ready, waiting... (attempt $RETRY_COUNT/$MAX_RETRIES)"
         sleep 2
     done
     echo "Database is ready!"
