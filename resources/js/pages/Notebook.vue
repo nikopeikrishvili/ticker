@@ -177,106 +177,8 @@ const cssVars = computed(() => ({
     '--border-color': appearance.value.borderColor,
 }));
 
-// Notification system for active timers
-let notificationInterval = null;
-const lastNotifiedHour = ref({});
-const notificationPermission = ref('default');
-
-const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-        console.log('Notifications not supported');
-        return;
-    }
-
-    console.log('Current notification permission:', Notification.permission);
-
-    // If already granted, just update state
-    if (Notification.permission === 'granted') {
-        notificationPermission.value = 'granted';
-        return;
-    }
-
-    // Try to request permission
-    const result = await Notification.requestPermission();
-    notificationPermission.value = result;
-    console.log('Notification permission result:', result);
-
-    if (result === 'granted') {
-        // Test notification
-        new Notification('შეტყობინებები ჩართულია!', {
-            body: 'თქვენ მიიღებთ შეტყობინებას ყოველ საათში აქტიური ტაიმერისთვის.',
-            icon: '/favicon.ico',
-        });
-    }
-};
-
-const getElapsedMinutesForLog = (log) => {
-    if (!log.start_time || log.end_time) return 0;
-    const [startHour, startMin] = log.start_time.split(':').map(Number);
-    const startTotal = startHour * 60 + startMin;
-    const now = new Date();
-    const nowTotal = now.getHours() * 60 + now.getMinutes();
-    return Math.max(0, nowTotal - startTotal);
-};
-
-const sendTimerNotification = (log, elapsedMinutes) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        const hours = Math.floor(elapsedMinutes / 60);
-        const mins = elapsedMinutes % 60;
-        const timeStr = `${hours}:${mins.toString().padStart(2, '0')}`;
-
-        console.log('Sending notification for', log.description, timeStr);
-
-        new Notification('ტაიმერი აქტიურია', {
-            body: `${log.description || 'დავალება'} - ${timeStr} გავიდა`,
-            icon: '/favicon.ico',
-            tag: `timer-${log.id}-${hours}h`,
-            requireInteraction: true,
-        });
-    }
-};
-
-const checkHourlyNotifications = () => {
-    const runningLogs = timeLogs.value.filter(log => !log.end_time);
-    console.log('Checking notifications, running logs:', runningLogs.length);
-
-    for (const log of runningLogs) {
-        const elapsedMinutes = getElapsedMinutesForLog(log);
-        const currentHour = Math.floor(elapsedMinutes / 60);
-
-        console.log(`Log ${log.id}: ${elapsedMinutes} mins, hour ${currentHour}, last notified: ${lastNotifiedHour.value[log.id]}`);
-
-        // Send notification when a new hour is reached (and at least 1 hour has passed)
-        if (currentHour > 0 && lastNotifiedHour.value[log.id] !== currentHour) {
-            lastNotifiedHour.value[log.id] = currentHour;
-            sendTimerNotification(log, elapsedMinutes);
-        }
-    }
-
-    // Clean up entries for stopped logs
-    const runningIds = new Set(runningLogs.map(l => l.id));
-    for (const id in lastNotifiedHour.value) {
-        if (!runningIds.has(Number(id))) {
-            delete lastNotifiedHour.value[id];
-        }
-    }
-};
-
-const startNotificationChecker = () => {
-    if (notificationInterval) return;
-
-    // Check every minute
-    notificationInterval = setInterval(checkHourlyNotifications, 60000);
-    // Also check immediately
-    checkHourlyNotifications();
-    console.log('Notification checker started');
-};
-
 onMounted(async () => {
     document.addEventListener('keydown', handleKeyDown, true);
-
-    // Request notification permission immediately on page load
-    await requestNotificationPermission();
 
     await fetchSettings();
     // Initialize date from server (respects timezone setting)
@@ -291,17 +193,11 @@ onMounted(async () => {
             pendingTasks.value = pending;
             showCarryOverDialog.value = true;
         }
-
-        // Start notification checker after data is loaded
-        startNotificationChecker();
     }
 });
 
 onUnmounted(() => {
     document.removeEventListener('keydown', handleKeyDown, true);
-    if (notificationInterval) {
-        clearInterval(notificationInterval);
-    }
 });
 </script>
 
@@ -325,25 +221,6 @@ onUnmounted(() => {
                         დღეს
                     </span>
                 </div>
-                <div class="flex-1"></div>
-                <!-- Notification permission button -->
-                <button
-                    v-if="notificationPermission === 'denied' || notificationPermission === 'default'"
-                    @click="requestNotificationPermission"
-                    class="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors"
-                    :class="notificationPermission === 'denied'
-                        ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
-                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'"
-                    :title="notificationPermission === 'denied'
-                        ? 'დააჭირეთ ან ბრაუზერის პარამეტრებში ჩართეთ'
-                        : 'დააჭირეთ შეტყობინებების ჩასართავად'"
-                >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
-                    <span v-if="notificationPermission === 'denied'">შეტყობინებები დაბლოკილია</span>
-                    <span v-else>შეტყობინებების ჩართვა</span>
-                </button>
             </header>
 
             <div class="flex-1 p-4">
