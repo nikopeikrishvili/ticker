@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useSettings } from '@/composables/useSettings';
+import { useAuth } from '@/composables/useAuth';
 import axios from 'axios';
 
 const props = defineProps({
@@ -13,8 +14,9 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const { settings, general, appearance, integrations, updateSettings, resetAllSettings, applyTheme, DEFAULTS } = useSettings();
+const { user, updateProfile, updatePassword } = useAuth();
 
-const activeTab = ref('general');
+const activeTab = ref('profile');
 const localSettings = ref({});
 const jiraTesting = ref(false);
 const jiraTestResult = ref(null);
@@ -24,6 +26,14 @@ const syncTaskModal = ref(false);
 const syncTaskId = ref('');
 const syncingTask = ref(false);
 const syncTaskResult = ref(null);
+
+// Profile state
+const profileForm = ref({ name: '', email: '', current_password: '' });
+const profileSaving = ref(false);
+const profileMessage = ref(null);
+const passwordForm = ref({ current_password: '', password: '', password_confirmation: '' });
+const passwordSaving = ref(false);
+const passwordMessage = ref(null);
 
 // Common timezones
 const timezones = [
@@ -40,6 +50,7 @@ const timezones = [
 ];
 
 const tabs = [
+    { id: 'profile', label: 'პროფილი' },
     { id: 'general', label: 'ზოგადი' },
     { id: 'appearance', label: 'გარეგნობა' },
     { id: 'integrations', label: 'ინტეგრაციები' },
@@ -48,10 +59,15 @@ const tabs = [
 // Sync local settings when modal opens
 watch(() => props.show, (newVal) => {
     if (newVal) {
-        activeTab.value = 'general';
+        activeTab.value = 'profile';
         jiraTestResult.value = null;
         jiraSyncResult.value = null;
         syncTaskResult.value = null;
+        // Reset profile forms
+        profileForm.value = { name: user.value?.name || '', email: user.value?.email || '', current_password: '' };
+        profileMessage.value = null;
+        passwordForm.value = { current_password: '', password: '', password_confirmation: '' };
+        passwordMessage.value = null;
         localSettings.value = {
             timezone: general.value.timezone,
             theme: appearance.value.theme,
@@ -70,6 +86,42 @@ watch(() => props.show, (newVal) => {
         };
     }
 });
+
+const saveProfile = async () => {
+    profileSaving.value = true;
+    profileMessage.value = null;
+    try {
+        await updateProfile(profileForm.value);
+        profileForm.value.current_password = '';
+        profileMessage.value = { success: true, text: 'პროფილი წარმატებით განახლდა.' };
+    } catch (error) {
+        const errors = error.response?.data?.errors;
+        profileMessage.value = {
+            success: false,
+            text: errors ? Object.values(errors).flat().join(' ') : 'შეცდომა მოხდა.',
+        };
+    } finally {
+        profileSaving.value = false;
+    }
+};
+
+const savePassword = async () => {
+    passwordSaving.value = true;
+    passwordMessage.value = null;
+    try {
+        await updatePassword(passwordForm.value);
+        passwordForm.value = { current_password: '', password: '', password_confirmation: '' };
+        passwordMessage.value = { success: true, text: 'პაროლი წარმატებით შეიცვალა.' };
+    } catch (error) {
+        const errors = error.response?.data?.errors;
+        passwordMessage.value = {
+            success: false,
+            text: errors ? Object.values(errors).flat().join(' ') : 'შეცდომა მოხდა.',
+        };
+    } finally {
+        passwordSaving.value = false;
+    }
+};
 
 const handleSave = async () => {
     await updateSettings({
@@ -248,8 +300,106 @@ const formatLastSync = (isoDate) => {
 
                     <!-- Content -->
                     <div class="p-6 max-h-[60vh] overflow-y-auto">
+                        <!-- Profile Tab -->
+                        <div v-if="activeTab === 'profile'">
+                            <!-- User Info Section -->
+                            <div class="mb-6">
+                                <h4 class="text-sm font-semibold text-[#1f2937] dark:text-gray-200 mb-3 uppercase tracking-wide">მომხმარებლის ინფორმაცია</h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">სახელი</label>
+                                        <input
+                                            v-model="profileForm.name"
+                                            type="text"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">ელ-ფოსტა</label>
+                                        <input
+                                            v-model="profileForm.email"
+                                            type="email"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div v-if="profileForm.email !== (user?.email || '')">
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">მიმდინარე პაროლი</label>
+                                        <input
+                                            v-model="profileForm.current_password"
+                                            type="password"
+                                            placeholder="საჭიროა ელ-ფოსტის შეცვლისთვის"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button
+                                            @click="saveProfile"
+                                            :disabled="profileSaving"
+                                            class="px-4 py-2 bg-[#346ec9] text-white rounded-lg hover:bg-[#2d5eb0] transition-colors text-sm disabled:opacity-50"
+                                        >
+                                            {{ profileSaving ? 'ინახება...' : 'შენახვა' }}
+                                        </button>
+                                        <span
+                                            v-if="profileMessage"
+                                            class="text-sm"
+                                            :class="profileMessage.success ? 'text-green-600' : 'text-red-600'"
+                                        >
+                                            {{ profileMessage.text }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Password Section -->
+                            <div class="pt-6 border-t border-[#e5e7eb] dark:border-gray-700">
+                                <h4 class="text-sm font-semibold text-[#1f2937] dark:text-gray-200 mb-3 uppercase tracking-wide">პაროლის შეცვლა</h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">მიმდინარე პაროლი</label>
+                                        <input
+                                            v-model="passwordForm.current_password"
+                                            type="password"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">ახალი პაროლი</label>
+                                        <input
+                                            v-model="passwordForm.password"
+                                            type="password"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-1">ახალი პაროლი (ხელახლა)</label>
+                                        <input
+                                            v-model="passwordForm.password_confirmation"
+                                            type="password"
+                                            class="w-full px-3 py-2 border border-[#e5e7eb] dark:border-gray-600 rounded-lg text-sm text-[#1f2937] dark:text-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#346ec9]"
+                                        />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button
+                                            @click="savePassword"
+                                            :disabled="passwordSaving"
+                                            class="px-4 py-2 bg-[#346ec9] text-white rounded-lg hover:bg-[#2d5eb0] transition-colors text-sm disabled:opacity-50"
+                                        >
+                                            {{ passwordSaving ? 'ინახება...' : 'პაროლის შეცვლა' }}
+                                        </button>
+                                        <span
+                                            v-if="passwordMessage"
+                                            class="text-sm"
+                                            :class="passwordMessage.success ? 'text-green-600' : 'text-red-600'"
+                                        >
+                                            {{ passwordMessage.text }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- General Tab -->
-                        <div v-if="activeTab === 'general'">
+                        <div v-else-if="activeTab === 'general'">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-[#1f2937] dark:text-gray-200 mb-2">დროის ზონა</label>
                                 <select
@@ -565,8 +715,8 @@ const formatLastSync = (isoDate) => {
                         </div>
                     </div>
 
-                    <!-- Footer -->
-                    <div class="px-6 py-4 bg-[#e5e7eb]/30 dark:bg-gray-900/30 flex justify-between border-t border-[#e5e7eb] dark:border-gray-700">
+                    <!-- Footer (hidden on profile tab which has its own save buttons) -->
+                    <div v-if="activeTab !== 'profile'" class="px-6 py-4 bg-[#e5e7eb]/30 dark:bg-gray-900/30 flex justify-between border-t border-[#e5e7eb] dark:border-gray-700">
                         <button
                             @click="handleReset"
                             class="px-4 py-2 text-[#9ca3af] hover:text-[#1f2937] dark:hover:text-gray-200 hover:bg-[#e5e7eb] dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"

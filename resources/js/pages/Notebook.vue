@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
 import TodoList from '@/components/TodoList.vue';
 import TimeLogList from '@/components/TimeLogList.vue';
 import TodoModal from '@/components/TodoModal.vue';
@@ -180,6 +181,11 @@ const cssVars = computed(() => ({
 
 onMounted(async () => {
     document.addEventListener('keydown', handleKeyDown, true);
+
+    // Performance test
+    const pingStart = performance.now();
+    await axios.get('/api/ping');
+    console.log(`[ping] ${Math.round(performance.now() - pingStart)}ms`);
 
     await fetchSettings();
     // Initialize date from server (respects timezone setting)

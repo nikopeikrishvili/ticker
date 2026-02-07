@@ -7,6 +7,7 @@ use App\Http\Controllers\WeeklyPlannerController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\IntegrationsController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -83,6 +84,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{recurringTask}', [RecurringTaskController::class, 'destroy']);
         Route::post('/{recurringTask}/toggle', [RecurringTaskController::class, 'toggle']);
     });
+
+    // Ping (performance test)
+    Route::get('/api/ping', fn () => response()->json(['ok' => true]));
+
+    // Profile API routes
+    Route::put('/api/profile', [ProfileController::class, 'update']);
+    Route::put('/api/profile/password', [ProfileController::class, 'updatePassword']);
 
     // Integrations API routes
     Route::prefix('api/integrations')->group(function () {
