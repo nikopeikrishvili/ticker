@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import TodoList from '@/components/TodoList.vue';
 import TimeLogList from '@/components/TimeLogList.vue';
 import TodoModal from '@/components/TodoModal.vue';
@@ -202,6 +203,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <Head title="რვეული" />
     <SidebarProvider :style="{ '--sidebar-width': '16rem', ...cssVars }">
         <AppSidebar
             current-page="notebook"

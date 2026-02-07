@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import { useWeeklyPlanner } from '@/composables/useWeeklyPlanner';
 import { useTodos } from '@/composables/useTodos';
 import { useSettings } from '@/composables/useSettings';
@@ -150,6 +151,7 @@ const handleCarriedOver = () => {
 </script>
 
 <template>
+    <Head title="კვირის დაგეგმვა" />
     <SidebarProvider :style="{ '--sidebar-width': '16rem', ...cssVars }">
         <AppSidebar
             current-page="weekly"

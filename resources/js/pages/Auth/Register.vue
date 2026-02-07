@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -18,6 +18,7 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="რეგისტრაცია" />
     <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
         <div class="w-full max-w-md">
             <!-- Logo/Header -->

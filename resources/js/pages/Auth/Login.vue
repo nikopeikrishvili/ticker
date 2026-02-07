@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -19,6 +19,7 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="შესვლა" />
     <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
         <div class="w-full max-w-md">
             <!-- Logo/Header -->
