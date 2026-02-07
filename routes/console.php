@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Schedule recurring todos generation at noon every day
 Schedule::command('todos:generate-recurring')->dailyAt('12:00');
+
+// Schedule Jira sync every hour
+Schedule::command('sync:jira')->hourly();
