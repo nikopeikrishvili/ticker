@@ -16,10 +16,12 @@ import { Card } from '@/components/ui/card';
 import { useTodos } from '@/composables/useTodos';
 import { useTimeLogs } from '@/composables/useTimeLogs';
 import { useSettings } from '@/composables/useSettings';
+import { useOnboarding } from '@/composables/useOnboarding';
 
 const { addTodo, initializeDate, fetchTodos, fetchPendingFromPrevious, startWorking } = useTodos();
 const { timeLogs, addTimeLog, navigateDay, goToToday, formattedDate, isToday, fetchTimeLogs, stopTimeLog } = useTimeLogs();
 const { fetchSettings, serverDate, appearance, updateSetting, applyTheme } = useSettings();
+const { checkAndStartTour } = useOnboarding();
 
 const showTodoModal = ref(false);
 const showTimeLogModal = ref(false);
@@ -199,6 +201,9 @@ onMounted(async () => {
         if (pending.length > 0) {
             pendingTasks.value = pending;
             showCarryOverDialog.value = true;
+        } else {
+            // Only auto-start tour if no carry-over dialog is shown
+            checkAndStartTour();
         }
     }
 });
@@ -217,7 +222,7 @@ onUnmounted(() => {
             @action="handleSidebarAction"
         />
         <SidebarInset>
-            <header class="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+            <header class="flex h-14 shrink-0 items-center gap-2 border-b px-4" data-tour="header">
                 <SidebarTrigger class="-ml-1" />
                 <Separator orientation="vertical" class="mr-2 h-4" />
                 <div class="flex items-center gap-2">

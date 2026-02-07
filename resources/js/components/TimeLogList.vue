@@ -284,7 +284,7 @@ const getHourWorkedMinutes = (hour) => {
 </script>
 
 <template>
-    <div class="h-full flex flex-col">
+    <div class="h-full flex flex-col" data-tour="time-log-list">
         <!-- Controls -->
         <div class="mb-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -575,7 +575,7 @@ const getHourWorkedMinutes = (hour) => {
         </div>
 
         <!-- Progress Bar -->
-        <div class="mt-4 pt-4 border-t border-border">
+        <div class="mt-4 pt-4 border-t border-border" data-tour="time-log-progress">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">
                     <span class="text-xs text-muted-foreground">სამუშაო დღე (8 სთ)</span>
