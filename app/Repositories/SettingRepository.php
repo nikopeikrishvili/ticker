@@ -3,12 +3,31 @@
 namespace App\Repositories;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Cache;
 
 class SettingRepository extends BaseRepository
 {
+    private const CACHE_TTL = 3600; // 1 hour
+
     public function __construct()
     {
         parent::__construct(new Setting());
+    }
+
+    /**
+     * Get the cache key for the current user's settings.
+     */
+    private function getCacheKey(): string
+    {
+        return 'settings:user:' . $this->getUserId();
+    }
+
+    /**
+     * Clear the settings cache for the current user.
+     */
+    public function clearCache(): void
+    {
+        Cache::forget($this->getCacheKey());
     }
 
     /**
@@ -16,20 +35,9 @@ class SettingRepository extends BaseRepository
      */
     public function getValue(string $key, mixed $default = null): mixed
     {
-        $setting = $this->query()
-            ->where('key', $key)
-            ->first();
+        $allSettings = $this->getAllSettings();
 
-        if ($setting) {
-            return $setting->value;
-        }
-
-        // Return default from DEFAULTS constant
-        if (isset(Setting::DEFAULTS[$key])) {
-            return Setting::DEFAULTS[$key]['value'];
-        }
-
-        return $default;
+        return $allSettings[$key] ?? $default;
     }
 
     /**
@@ -39,30 +47,36 @@ class SettingRepository extends BaseRepository
     {
         $category = Setting::DEFAULTS[$key]['category'] ?? 'general';
 
-        return Setting::updateOrCreate(
+        $setting = Setting::updateOrCreate(
             ['key' => $key, 'user_id' => $this->getUserId()],
             ['value' => $value, 'category' => $category]
         );
+
+        $this->clearCache();
+
+        return $setting;
     }
 
     /**
-     * Get all settings as key-value pairs.
+     * Get all settings as key-value pairs (cached).
      */
     public function getAllSettings(): array
     {
-        $settings = [];
+        return Cache::remember($this->getCacheKey(), self::CACHE_TTL, function () {
+            $settings = [];
 
-        // Start with defaults
-        foreach (Setting::DEFAULTS as $key => $config) {
-            $settings[$key] = $config['value'];
-        }
+            // Start with defaults
+            foreach (Setting::DEFAULTS as $key => $config) {
+                $settings[$key] = $config['value'];
+            }
 
-        // Override with database values
-        $this->query()->get()->each(function ($setting) use (&$settings) {
-            $settings[$setting->key] = $setting->value;
+            // Override with database values
+            $this->query()->get()->each(function ($setting) use (&$settings) {
+                $settings[$setting->key] = $setting->value;
+            });
+
+            return $settings;
         });
-
-        return $settings;
     }
 
     /**
@@ -70,24 +84,16 @@ class SettingRepository extends BaseRepository
      */
     public function getByCategory(string $category): array
     {
-        $settings = [];
+        $allSettings = $this->getAllSettings();
+        $categorySettings = [];
 
-        // Get defaults for this category
         foreach (Setting::DEFAULTS as $key => $config) {
-            if ($config['category'] === $category) {
-                $settings[$key] = $config['value'];
+            if ($config['category'] === $category && isset($allSettings[$key])) {
+                $categorySettings[$key] = $allSettings[$key];
             }
         }
 
-        // Override with database values
-        $this->query()
-            ->where('category', $category)
-            ->get()
-            ->each(function ($setting) use (&$settings) {
-                $settings[$setting->key] = $setting->value;
-            });
-
-        return $settings;
+        return $categorySettings;
     }
 
     /**
@@ -95,9 +101,13 @@ class SettingRepository extends BaseRepository
      */
     public function deleteByKey(string $key): int
     {
-        return $this->query()
+        $result = $this->query()
             ->where('key', $key)
             ->delete();
+
+        $this->clearCache();
+
+        return $result;
     }
 
     /**
@@ -105,6 +115,10 @@ class SettingRepository extends BaseRepository
      */
     public function deleteAll(): int
     {
-        return $this->query()->delete();
+        $result = $this->query()->delete();
+
+        $this->clearCache();
+
+        return $result;
     }
 }
