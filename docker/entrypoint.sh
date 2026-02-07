@@ -6,7 +6,7 @@ mkdir -p /var/log/supervisor /var/log/nginx /var/log/php
 
 # Wait for database to be ready (supports both PostgreSQL and MySQL)
 #if [ -n "$DATABASE_URL" ]; then
-#    echo "Waiting for database..."
+#    echo "Waiting for database1..."
 #    # Extract host from DATABASE_URL
 #    DB_HOST=$(echo $DATABASE_URL | sed -e 's|.*@\(.*\):.*|\1|')
 #    DB_PORT=$(echo $DATABASE_URL | sed -e 's|.*:\([0-9]*\)/.*|\1|')
