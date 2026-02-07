@@ -17,25 +17,26 @@ RUN npm run build
 
 
 # PHP Application
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     supervisor \
     curl \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     libzip-dev \
     zip \
     unzip \
-    oniguruma-dev \
-    icu-dev \
-    postgresql-dev \
+    libonig-dev \
+    libicu-dev \
+    libpq-dev \
     postgresql-client \
     netcat-openbsd \
-    redis
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -53,10 +54,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         opcache
 
 # Install Redis extension
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del .build-deps
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
