@@ -4,12 +4,25 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryRepository extends BaseRepository
 {
+    private const CACHE_TTL = 3600; // 1 hour
+
     public function __construct()
     {
         parent::__construct(new Category());
+    }
+
+    private function getCacheKey(): string
+    {
+        return 'categories:user:' . $this->getUserId();
+    }
+
+    public function clearCache(): void
+    {
+        Cache::forget($this->getCacheKey());
     }
 
     /**
@@ -17,9 +30,11 @@ class CategoryRepository extends BaseRepository
      */
     public function getAllOrdered(): Collection
     {
-        return $this->query()
-            ->ordered()
-            ->get();
+        return Cache::remember($this->getCacheKey(), self::CACHE_TTL, function () {
+            return $this->query()
+                ->ordered()
+                ->get();
+        });
     }
 
     /**
@@ -27,10 +42,9 @@ class CategoryRepository extends BaseRepository
      */
     public function getWithKeywords(): Collection
     {
-        return $this->query()
-            ->whereNotNull('keywords')
-            ->where('keywords', '!=', '')
-            ->get();
+        return $this->getAllOrdered()->filter(function ($category) {
+            return !empty($category->keywords);
+        })->values();
     }
 
     /**

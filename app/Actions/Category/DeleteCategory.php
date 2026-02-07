@@ -13,6 +13,9 @@ class DeleteCategory
 
     public function __invoke(Category $category): bool
     {
-        return $this->categoryRepository->delete($category);
+        $result = $this->categoryRepository->delete($category);
+        $this->categoryRepository->clearCache();
+
+        return $result;
     }
 }

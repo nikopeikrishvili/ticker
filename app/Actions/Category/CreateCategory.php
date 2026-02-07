@@ -17,6 +17,9 @@ class CreateCategory
         $attributes = $data->toArray();
         $attributes['order'] = $this->categoryRepository->getNextOrder();
 
-        return $this->categoryRepository->create($attributes);
+        $category = $this->categoryRepository->create($attributes);
+        $this->categoryRepository->clearCache();
+
+        return $category;
     }
 }

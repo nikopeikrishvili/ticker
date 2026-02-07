@@ -15,6 +15,7 @@ class UpdateCategory
     public function __invoke(Category $category, UpdateCategoryData $data): Category
     {
         $this->categoryRepository->update($category, $data->toArray());
+        $this->categoryRepository->clearCache();
 
         return $category->fresh();
     }
