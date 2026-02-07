@@ -16,33 +16,11 @@ abstract class BaseRepository
     }
 
     /**
-     * Get a new query builder for the model's table, scoped to the current user.
+     * Get a new query builder scoped to the current user.
      */
     protected function query(): Builder
     {
-        $query = $this->model->newQuery();
-
-        if ($this->shouldScopeByUser()) {
-            $query->where('user_id', $this->getUserId());
-        }
-
-        return $query;
-    }
-
-    /**
-     * Whether this repository should automatically scope queries by user.
-     */
-    protected function shouldScopeByUser(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Get the current authenticated user ID.
-     */
-    protected function getUserId(): ?int
-    {
-        return auth()->id();
+        return $this->model->newQuery()->where('user_id', auth()->id());
     }
 
     /**
@@ -74,9 +52,7 @@ abstract class BaseRepository
      */
     public function create(array $attributes): Model
     {
-        if ($this->shouldScopeByUser()) {
-            $attributes['user_id'] = $this->getUserId();
-        }
+        $attributes['user_id'] = auth()->id();
 
         return $this->model->create($attributes);
     }
@@ -98,14 +74,18 @@ abstract class BaseRepository
     }
 
     /**
+     * Get the current authenticated user ID.
+     */
+    protected function getUserId(): ?int
+    {
+        return auth()->id();
+    }
+
+    /**
      * Check if the given model belongs to the current user.
      */
     public function belongsToUser(Model $model): bool
     {
-        if (!$this->shouldScopeByUser()) {
-            return true;
-        }
-
-        return $model->user_id === $this->getUserId();
+        return $model->user_id === auth()->id();
     }
 }
